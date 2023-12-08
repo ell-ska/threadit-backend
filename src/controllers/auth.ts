@@ -51,3 +51,19 @@ export const login = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'internal server error' })
   }
 }
+
+export const profile = async (req: Request, res: Response) => {
+  const { userId } = req
+  if (!userId) {
+    return res.status(400).json({ message: 'missing user id' })
+  }
+
+  const user = await User.findById(userId)
+  if (!user) {
+    return res.status(404).json({ message: 'user not found' })
+  }
+
+  res.status(200).json({
+    username: user.username
+  })
+}
