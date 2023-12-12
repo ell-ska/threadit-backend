@@ -14,14 +14,12 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
     throw Error('missing JWT_SECRET')
   }
 
-  jwt.verify(token, secret, (error, payload) => {
-    if (error) {
+  jwt.verify(token, secret, (error, decodedToken) => {
+    if (error || !decodedToken || typeof decodedToken === 'string') {
       return res.status(403).json({ message: 'access forbidden' })
     }
 
-    const decodedToken = payload as { userId: string } | undefined
-
-    req.userId = decodedToken?.userId
+    req.userId = decodedToken.userId
     next()
   })
 }
