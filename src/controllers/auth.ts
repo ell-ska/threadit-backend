@@ -42,13 +42,45 @@ export const login = async (req: Request, res: Response) => {
     if (!secret) {
       throw Error('missing JWT_SECRET')
     }
-    
-    const token = jwt.sign({ userId: user._id }, secret)
+    const token = jwt.sign({ userId: user._id }, secret, { expiresIn: '1h' })
 
-    res.status(200).json({ token, username })
+    const refreshTokenSecret = process.env.REFRESH_JWT_SECRET
+    if (!refreshTokenSecret) {
+      throw Error('missing REFRESH_JWT_SECRET')
+    }
+    const refreshToken = jwt.sign({ userId: user._id }, secret)
+
+    res.status(200).json({ token, refreshToken, username })
   } catch (error) {
     console.log(error)
     res.status(500).json({ message: 'internal server error' })
+  }
+}
+
+export const refreshJWT = async (req: Request, res: Response) => {
+  const { refreshToken } = req.body
+
+  const refreshTokenSecret = process.env.REFRESH_JWT_SECRET
+  if (!refreshTokenSecret) {
+    throw Error('missing REFRESH_JWT_SECRET')
+  }
+
+  try {
+    const payload = jwt.verify(refreshToken, refreshTokenSecret) as { userId: string } | undefined
+
+    const secret = process.env.JWT_SECRET
+    if (!secret) {
+      throw Error('missing JWT_SECRET')
+    }
+    const token = jwt.sign({ userId: payload?.userId }, secret, { expiresIn: '1h' })
+
+    return res.status(200).json({
+      token
+    })
+  } catch (error) {
+    return res.status(403).json({
+      message: 'invalid refresh token'
+    })
   }
 }
 
