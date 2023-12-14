@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
-import Post from '../models/Post'
+
 import { assertIsDefined } from '../utils/assertions'
-import User from '../models/User'
+import Post from '../models/Post'
 
 export const createPost = async (req: Request, res: Response) => {
   assertIsDefined(req.userId)
