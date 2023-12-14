@@ -17,6 +17,7 @@ app.get('/profile', validateToken, authController.profile)
 
 app.post('/posts', validateToken, postController.createPost)
 app.get('/posts', postController.getAllPosts)
+app.get('/posts/:id', postController.getPost)
 
 const mongoUrl = process.env.DB_URL
 if (!mongoUrl) throw Error('missing db url')
