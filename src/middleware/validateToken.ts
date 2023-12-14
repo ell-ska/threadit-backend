@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 
+import { assertIsDefined } from '../utils/assertions'
+import User from '../models/User'
+
 const validateToken = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers['authorization']
   
@@ -10,12 +13,10 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
   }
 
   const secret = process.env.JWT_SECRET
-  if (!secret) {
-    throw Error('missing JWT_SECRET')
-  }
+  assertIsDefined(secret)
 
-  jwt.verify(token, secret, (error, decodedToken) => {
-    if (error || !decodedToken || typeof decodedToken === 'string') {
+  jwt.verify(token, secret, async (error, decodedToken) => {
+    if (error || !decodedToken || typeof decodedToken === 'string' || !await User.exists({ _id: decodedToken.userId })) {
       return res.status(403).json({ message: 'access forbidden' })
     }
 
