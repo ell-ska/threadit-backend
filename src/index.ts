@@ -4,6 +4,7 @@ import cors from 'cors'
 
 import 'dotenv/config'
 import * as authController from './controllers/auth'
+import * as postController from './controllers/post'
 import validateToken from './middleware/validateToken'
 
 const app = express()
@@ -13,6 +14,9 @@ app.use(express.json())
 app.post('/sign-up', authController.register)
 app.post('/sign-in', authController.login)
 app.get('/profile', validateToken, authController.profile)
+
+app.post('/posts', validateToken, postController.createPost)
+app.get('/posts', postController.getAllPosts)
 
 const mongoUrl = process.env.DB_URL
 if (!mongoUrl) throw Error('missing db url')
