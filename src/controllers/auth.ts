@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
+import { assertIsDefined } from '../utils/assertions'
 import User from '../models/User'
 
 export const register = async (req: Request, res: Response) => {
@@ -39,15 +40,11 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const secret = process.env.JWT_SECRET
-    if (!secret) {
-      throw Error('missing JWT_SECRET')
-    }
+    assertIsDefined(secret)
     const token = jwt.sign({ userId: user._id }, secret, { expiresIn: '1h' })
 
     const refreshTokenSecret = process.env.REFRESH_JWT_SECRET
-    if (!refreshTokenSecret) {
-      throw Error('missing REFRESH_JWT_SECRET')
-    }
+    assertIsDefined(refreshTokenSecret)
     const refreshToken = jwt.sign({ userId: user._id }, secret)
 
     res.status(200).json({ token, refreshToken, username })
@@ -61,17 +58,13 @@ export const refreshJWT = async (req: Request, res: Response) => {
   const { refreshToken } = req.body
 
   const refreshTokenSecret = process.env.REFRESH_JWT_SECRET
-  if (!refreshTokenSecret) {
-    throw Error('missing REFRESH_JWT_SECRET')
-  }
+  assertIsDefined(refreshTokenSecret)
 
   try {
     const payload = jwt.verify(refreshToken, refreshTokenSecret) as { userId: string } | undefined
 
     const secret = process.env.JWT_SECRET
-    if (!secret) {
-      throw Error('missing JWT_SECRET')
-    }
+    assertIsDefined(secret)
     const token = jwt.sign({ userId: payload?.userId }, secret, { expiresIn: '1h' })
 
     return res.status(200).json({
