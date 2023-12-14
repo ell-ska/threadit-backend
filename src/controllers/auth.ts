@@ -34,7 +34,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'missing username or password' })
     }
     
-    const user = await User.findOne({ username })
+    const user = await User.findOne({ username }, '+password')
     if (!user || !await bcrypt.compare(password, user.password)) {
       return res.status(400).json({ message: 'wrong username or password' })
     }
