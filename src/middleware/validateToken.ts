@@ -16,7 +16,12 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
   assertIsDefined(secret)
 
   jwt.verify(token, secret, async (error, decodedToken) => {
-    if (error || !decodedToken || typeof decodedToken === 'string' || !await User.exists({ _id: decodedToken.userId })) {
+    if (
+      error
+      || !decodedToken
+      || typeof decodedToken === 'string'
+      || !await User.exists({ _id: decodedToken.userId })
+    ) {
       return res.status(403).json({ message: 'access forbidden' })
     }
 
