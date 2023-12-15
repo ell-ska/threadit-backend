@@ -1,6 +1,27 @@
-import { Document, Schema, Types, model } from 'mongoose'
+import { Document, Model, Schema, Types, model } from 'mongoose'
 
-import { getOGImage } from '../utils/getOgImage'
+import { getOGImage } from '../utils/getOGImage'
+
+interface IComment extends Document {
+  body: string
+  author: Types.ObjectId
+  createdAt: Date
+  updatedAt: Date
+}
+
+const CommentSchema = new Schema<IComment>({
+  body: {
+    type: String,
+    required: true
+  },
+  author: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  }
+}, {
+  timestamps: true
+})
 
 interface IPost extends Document {
   author: Types.ObjectId
@@ -12,34 +33,39 @@ interface IPost extends Document {
   body?: string
   createdAt: Date
   updatedAt: Date
+  comments: IComment[]
 }
 
-const PostSchema = new Schema<IPost>({
-  author: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
+interface IPostProps {
+  comments: Types.DocumentArray<IComment>
+}
+
+type TPostModel = Model<IPost, {}, IPostProps>
+
+const PostSchema = new Schema<IPost, TPostModel>({
   title: {
     type: String,
     required: true,
     trim: true,
   },
   link: {
-    type: new Schema({
-      url: {
-        type: String,
-        required: true,
-        trim: true
-      },
-      image: {
-        type: String
-      },
-    })
+    url: {
+      type: String,
+      trim: true
+    },
+    image: {
+      type: String
+    },
   },
   body: {
     type: String,
-  }
+  },
+  author: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  comments: [CommentSchema]
 }, {
   timestamps: true,
 })
@@ -53,6 +79,6 @@ PostSchema.pre('save', async function(next) {
   }
 })
 
-const Post = model<IPost>('Post', PostSchema)
+const Post = model<IPost, TPostModel>('Post', PostSchema)
 
 export default Post

@@ -37,7 +37,7 @@ export const getAllPosts = async (req: Request, res: Response) => {
   }
 
   const posts = await Post
-    .find()
+    .find({}, '-comments')
     .sort({ createdAt: 'desc' })
     .limit(limit)
     .skip(limit * (page - 1))
@@ -54,7 +54,11 @@ export const getAllPosts = async (req: Request, res: Response) => {
 export const getPost = async (req: Request, res: Response) => {
   const { id } = req.params
 
-  const post = await Post.findById(id).populate('author', 'username')
+  const post = await Post
+    .findById(id)
+    .populate('author', 'username')
+    .populate('comments.author', 'username')
+
   if (!post) {
     return res.status(404).json({
       message: `post not found for id: ${id}`
