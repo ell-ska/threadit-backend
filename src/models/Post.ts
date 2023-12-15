@@ -26,14 +26,16 @@ const PostSchema = new Schema<IPost>({
     trim: true,
   },
   link: {
-    url: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    image: {
-      type: String
-    }
+    type: new Schema({
+      url: {
+        type: String,
+        required: true,
+        trim: true
+      },
+      image: {
+        type: String
+      },
+    })
   },
   body: {
     type: String,
