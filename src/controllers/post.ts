@@ -9,9 +9,7 @@ export const createPost = async (req: Request, res: Response) => {
 
   const post = new Post({
     title,
-    link: {
-      url: link || null
-    },
+    link: link ? { url: link } : null,
     body,
     author: req.userId
   })
