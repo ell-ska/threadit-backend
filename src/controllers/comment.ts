@@ -8,7 +8,7 @@ export const createComment = async (req: Request, res: Response) => {
   assertIsDefined(userId)
 
   const { postId } = req.params
-  const { body } = req.body
+  const { comment } = req.body
 
   const post = await Post.findById(postId)
   if (!post) {
@@ -18,7 +18,7 @@ export const createComment = async (req: Request, res: Response) => {
   } 
 
   post.comments.push({
-    body,
+    body: comment,
     author: userId
   })
 
@@ -61,7 +61,7 @@ export const deleteComment = async (req: Request, res: Response) => {
   try {
     comment.deleteOne()
     const updatedPost = await post.save()
-    
+
     return res.status(200).json(updatedPost)
   } catch (error) {
     return res.status(500).json({

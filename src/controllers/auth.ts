@@ -67,6 +67,8 @@ export const refreshJWT = async (req: Request, res: Response) => {
     assertIsDefined(secret)
     const token = jwt.sign({ userId: payload?.userId }, secret, { expiresIn: '1h' })
 
+    console.log('token refreshed: ' + token)
+
     return res.status(200).json({
       token
     })
