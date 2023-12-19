@@ -9,7 +9,7 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
   
   const token = authHeader?.split(' ')[1]
   if (!token) {
-    return res.status(401).json({ message: 'unauthorized' })
+    return res.status(401).json({ message: 'unauthenticated' })
   }
 
   const secret = process.env.JWT_SECRET
@@ -22,7 +22,7 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
       || typeof decodedToken === 'string'
       || !await User.exists({ _id: decodedToken.userId })
     ) {
-      return res.status(403).json({ message: 'access forbidden' })
+      return res.status(403).json({ message: 'unauthorized' })
     }
 
     req.userId = decodedToken.userId
