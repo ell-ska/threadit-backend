@@ -45,7 +45,7 @@ export const login = async (req: Request, res: Response) => {
 
     const refreshTokenSecret = process.env.REFRESH_JWT_SECRET
     assertIsDefined(refreshTokenSecret)
-    const refreshToken = jwt.sign({ userId: user._id }, secret)
+    const refreshToken = jwt.sign({ userId: user._id }, refreshTokenSecret)
 
     res.status(200).json({ token, refreshToken, username })
   } catch (error) {
@@ -61,13 +61,11 @@ export const refreshJWT = async (req: Request, res: Response) => {
   assertIsDefined(refreshTokenSecret)
 
   try {
-    const payload = jwt.verify(refreshToken, refreshTokenSecret)
+    const payload = jwt.verify(refreshToken, refreshTokenSecret) as { userId: string } | undefined
 
     const secret = process.env.JWT_SECRET
     assertIsDefined(secret)
     const token = jwt.sign({ userId: payload?.userId }, secret, { expiresIn: '1h' })
-
-    console.log('token refreshed: ' + token)
 
     return res.status(200).json({
       token
