@@ -7,25 +7,17 @@ export const createPost = async (req: Request, res: Response) => {
   assertIsDefined(req.userId)
   const { title, link, body } = req.body
 
-  console.log(link)
-
-  const postData = {
+  const post = new Post({
     title,
     link: link ? { url: link } : null,
     body,
     author: req.userId
-  }
+  })
 
-  console.log(postData)
-  console.log(postData.link)
-
-  const post = new Post(postData)
-  console.log(post)
   try {
     const savedPost = await post.save()
     return res.status(201).json(savedPost)
   } catch (error) {
-    console.log(error)
     return res.status(500).json({
       message: 'failed to create post'
     })
