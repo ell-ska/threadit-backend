@@ -13,7 +13,7 @@ export const createPost = async (req: Request, res: Response) => {
     body,
     author: req.userId
   })
-
+  console.log(post)
   try {
     const savedPost = await post.save()
     return res.status(201).json(savedPost)
