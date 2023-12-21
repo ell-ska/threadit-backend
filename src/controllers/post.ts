@@ -7,12 +7,16 @@ export const createPost = async (req: Request, res: Response) => {
   assertIsDefined(req.userId)
   const { title, link, body } = req.body
 
-  const post = new Post({
+  const postData = {
     title,
     link: link ? { url: link } : null,
     body,
     author: req.userId
-  })
+  }
+
+  console.log(postData)
+
+  const post = new Post(postData)
   console.log(post)
   try {
     const savedPost = await post.save()
