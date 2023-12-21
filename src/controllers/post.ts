@@ -34,12 +34,77 @@ export const getAllPosts = async (req: Request, res: Response) => {
     })
   }
 
-  const posts = await Post
-    .find({}, '-comments')
-    .sort({ createdAt: 'desc' })
-    .limit(limit)
-    .skip(limit * (page - 1))
-    .populate('author', 'username')
+  const posts = await Post.aggregate([
+    {
+      $addFields: {
+        sortValue: {
+          $divide: [
+            {
+              $add: [
+                { $ifNull: ['$score', 0] },
+                1
+              ]
+            },
+            {
+              $pow: [
+                {
+                  $add: [
+                    1,
+                    {
+                      $divide: [
+                        { $subtract: [new Date(), '$createdAt'] },
+                        1000 * 60 * 60
+                      ]
+                    }
+                  ]
+                },
+                1.5
+              ]
+            }
+          ]
+        }
+      }
+    },
+    { $sort: { sortValue: -1 } },
+    { $limit: limit },
+    { $skip: limit * (page - 1) },
+    {
+      $addFields: {
+        commentCount: {
+          $size: { $ifNull: ['$comments', []] }
+        }
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'author',
+        foreignField: '_id',
+        pipeline: [
+          {
+            $project: {
+              username: 1
+            }
+          }
+        ],
+        as: 'author'
+      },
+    },
+    { $unwind: '$author' },
+    {
+      $project: {
+        _id: 1,
+        author: 1,
+        title: 1,
+        link: 1,
+        body: 1,
+        score: 1,
+        commentCount: 1,
+        createdAt: 1,
+        updatedAt: 1,
+      }
+    },
+  ])
 
   const totalCount = await Post.countDocuments()
 
