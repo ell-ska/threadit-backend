@@ -61,7 +61,7 @@ export const refreshJWT = async (req: Request, res: Response) => {
   assertIsDefined(refreshTokenSecret)
 
   try {
-    const payload = jwt.verify(refreshToken, refreshTokenSecret) as { userId: string } | undefined
+    const payload = jwt.verify(refreshToken, refreshTokenSecret)
 
     const secret = process.env.JWT_SECRET
     assertIsDefined(secret)

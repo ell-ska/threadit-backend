@@ -18,6 +18,7 @@ export const createPost = async (req: Request, res: Response) => {
     const savedPost = await post.save()
     return res.status(201).json(savedPost)
   } catch (error) {
+    console.log(error)
     return res.status(500).json({
       message: 'failed to create post'
     })
