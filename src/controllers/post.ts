@@ -7,6 +7,8 @@ export const createPost = async (req: Request, res: Response) => {
   assertIsDefined(req.userId)
   const { title, link, body } = req.body
 
+  console.log(link)
+
   const postData = {
     title,
     link: link ? { url: link } : null,
@@ -15,6 +17,7 @@ export const createPost = async (req: Request, res: Response) => {
   }
 
   console.log(postData)
+  console.log(postData.link)
 
   const post = new Post(postData)
   console.log(post)
