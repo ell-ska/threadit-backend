@@ -6,6 +6,7 @@ import 'dotenv/config'
 import * as authController from './controllers/auth'
 import * as postController from './controllers/post'
 import * as commentController from './controllers/comment'
+import * as voteController from './controllers/vote'
 import validateToken from './middleware/validateToken'
 
 const app = express()
@@ -23,6 +24,9 @@ app.get('/posts/:id', postController.getPost)
 
 app.post('/posts/:postId/comments', validateToken, commentController.createComment)
 app.delete('/posts/:postId/comments/:commentId', validateToken, commentController.deleteComment)
+
+app.post('/posts/:postId/upvote', validateToken, voteController.upvote)
+app.post('/posts/:postId/downvote', validateToken, voteController.downvote)
 
 const mongoUrl = process.env.DB_URL
 if (!mongoUrl) throw Error('missing db url')

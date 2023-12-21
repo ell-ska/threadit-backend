@@ -34,10 +34,15 @@ interface IPost extends Document {
   createdAt: Date
   updatedAt: Date
   comments: IComment[]
+  upvotes: Types.Array<Types.ObjectId>
+  downvotes: Types.Array<Types.ObjectId>
+  score: number
 }
 
 interface IPostProps {
   comments: Types.DocumentArray<IComment>
+  upvote: (userId: string) => void
+  downvote: (userId: string) => void
 }
 
 type TPostModel = Model<IPost, {}, IPostProps>
@@ -65,18 +70,64 @@ const PostSchema = new Schema<IPost, TPostModel>({
     ref: 'User',
     required: true,
   },
-  comments: [CommentSchema]
+  comments: [CommentSchema],
+  upvotes: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  downvotes: [{
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  score: {
+    type: Number,
+    default: 0
+  }
 }, {
   timestamps: true,
 })
 
-PostSchema.pre('save', async function(next) {
-  if (!this.isModified('link')) next()
+PostSchema.method('upvote', function(this: IPost, userId: string) {
+  const userIdObject = new Types.ObjectId(userId)
 
-  if (this.link) {
-    const images = await getOGImage(this.link.url)
-    if (images) this.link.image = images[0].url
+  if (this.upvotes.includes(userIdObject)) {
+    return
   }
+
+  if (this.downvotes.includes(userIdObject)) {
+    this.downvotes.pull(userIdObject)
+  }
+
+  this.upvotes.push(userIdObject)
+})
+
+PostSchema.method('downvote', function(this: IPost, userId: string) {
+  const userIdObject = new Types.ObjectId(userId)
+
+  if (this.downvotes.includes(userIdObject)) {
+    return
+  }
+
+  if (this.upvotes.includes(userIdObject)) {
+    this.upvotes.pull(userIdObject)
+  }
+
+  this.downvotes.push(userIdObject)
+})
+
+PostSchema.pre('save', async function(next) {
+  if (this.isModified('link')) {
+    if (this.link) {
+      const images = await getOGImage(this.link.url)
+      if (images) this.link.image = images[0].url
+    }
+  }
+
+  if (this.isModified('upvotes') || this.isModified('downvotes')) {
+    this.score = this.upvotes.length - this.downvotes.length
+  }
+
+  next()
 })
 
 const Post = model<IPost, TPostModel>('Post', PostSchema)
