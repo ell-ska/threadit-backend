@@ -22,7 +22,7 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
       || typeof decodedToken === 'string'
       || !await User.exists({ _id: decodedToken.userId })
     ) {
-      return res.status(403).json({ message: 'unauthorized' })
+      return res.status(403).json({ message: 'token expired' })
     }
 
     req.userId = decodedToken.userId
