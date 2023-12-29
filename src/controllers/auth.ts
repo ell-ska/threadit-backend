@@ -47,7 +47,7 @@ export const login = async (req: Request, res: Response) => {
     assertIsDefined(refreshTokenSecret)
     const refreshToken = jwt.sign({ userId: user._id }, refreshTokenSecret)
 
-    res.status(200).json({ token, refreshToken, username })
+    res.status(200).json({ token, refreshToken, userId: user._id })
   } catch (error) {
     console.log(error)
     res.status(500).json({ message: 'internal server error' })

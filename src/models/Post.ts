@@ -24,7 +24,7 @@ const CommentSchema = new Schema<IComment>({
 })
 
 interface Image {
-  id: Types.ObjectId
+  _id: Types.ObjectId
   mimeType: string
   size: number
 }
@@ -79,7 +79,7 @@ const PostSchema = new Schema<IPost, TPostModel>({
     size: {
       type: Number
     },
-    id: {
+    _id: {
       type: Schema.Types.ObjectId
     }
   },

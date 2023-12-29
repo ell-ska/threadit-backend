@@ -34,7 +34,7 @@ export const createPost = async (req: Request, res: Response) => {
       post.image = {
         mimeType: req.file.mimetype,
         size: req.file.size,
-        id: fileId
+        _id: fileId
       }
     }
 
