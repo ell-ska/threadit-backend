@@ -89,8 +89,8 @@ export const getAllPosts = async (req: Request, res: Response) => {
       }
     },
     { $sort: { sortValue: -1 } },
-    { $limit: limit },
     { $skip: limit * (page - 1) },
+    { $limit: limit },
     {
       $addFields: {
         commentCount: {
