@@ -23,9 +23,10 @@ app.post('/token/refresh', authController.refreshJWT)
 app.get('/profile', validateToken, authController.profile)
 
 app.post('/posts', validateToken, upload.single('image'), postController.createPost)
+app.put('/posts/:id', validateToken, postController.editPost)
+app.delete('/posts/:id', validateToken, postController.deletePost)
 app.get('/posts', postController.getAllPosts)
 app.get('/posts/:id', postController.getPost)
-app.delete('/posts/:id', validateToken, postController.deletePost)
 
 app.post('/posts/:postId/comments', validateToken, commentController.createComment)
 app.delete('/posts/:postId/comments/:commentId', validateToken, commentController.deleteComment)

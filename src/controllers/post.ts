@@ -47,6 +47,44 @@ export const createPost = async (req: Request, res: Response) => {
   }
 }
 
+export const editPost = async (req: Request, res: Response) => {
+  assertIsDefined(req.userId)
+  const { id } = req.params
+  const { title, link, body } = req.body
+
+  const post = await Post.findById(id)
+
+  if (!post) {
+    return res.status(404).json({
+      message: `post not found for id: ${id}`
+    })
+  }
+
+  if (post.author.toString() !== req.userId) {
+    return res.status(403).json({
+      message: 'not authorized'
+    })
+  }
+
+  const edits = {
+    title,
+    link: link ? { url: link } : null,
+    body
+  }
+
+  post.set(edits)
+
+  try {
+    const editedPost = await post.save()
+    return res.status(200).json(editedPost)
+  } catch (error) {
+    console.log('EDIT_POST_ERROR', error)
+    return res.status(500).json({
+      message: 'failed to delete post'
+    })
+  }
+}
+
 export const deletePost = async (req: Request, res: Response) => {
   assertIsDefined(req.userId)
   const { id } = req.params
