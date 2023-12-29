@@ -47,12 +47,40 @@ export const createPost = async (req: Request, res: Response) => {
   }
 }
 
+export const deletePost = async (req: Request, res: Response) => {
+  assertIsDefined(req.userId)
+  const { id } = req.params
+
+  const post = await Post.findById(id)
+
+  if (!post) {
+    return res.status(404).json({
+      message: `post not found for id: ${id}`
+    })
+  }
+
+  if (post.author.toString() !== req.userId) {
+    return res.status(403).json({
+      message: 'not authorized'
+    })
+  }
+
+  try {
+    await post.deleteOne()
+    return res.status(200).json({ message: 'post deleted' })
+  } catch (error) {
+    return res.status(500).json({
+      message: 'failed to delete post'
+    })
+  }
+}
+
 export const getAllPosts = async (req: Request, res: Response) => {
   const limit = parseInt(req.query.limit?.toString() || '5')
   const page = parseInt(req.query.page?.toString() || '1')
 
   if (isNaN(page) || isNaN(limit)) {
-    res.status(400).json({
+    return res.status(400).json({
       message: 'malformed query'
     })
   }

@@ -25,6 +25,7 @@ app.get('/profile', validateToken, authController.profile)
 app.post('/posts', validateToken, upload.single('image'), postController.createPost)
 app.get('/posts', postController.getAllPosts)
 app.get('/posts/:id', postController.getPost)
+app.delete('/posts/:id', validateToken, postController.deletePost)
 
 app.post('/posts/:postId/comments', validateToken, commentController.createComment)
 app.delete('/posts/:postId/comments/:commentId', validateToken, commentController.deleteComment)
