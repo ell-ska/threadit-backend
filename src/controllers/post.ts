@@ -122,6 +122,8 @@ export const getAllPosts = async (req: Request, res: Response) => {
         link: 1,
         body: 1,
         score: 1,
+        upvotes: 1,
+        downvotes: 1,
         commentCount: 1,
         createdAt: 1,
         updatedAt: 1,
